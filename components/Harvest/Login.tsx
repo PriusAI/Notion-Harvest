@@ -1,4 +1,4 @@
-import { BaseProps } from './type'
+import { BaseProps } from './types'
 
 interface LoginProps extends BaseProps {}
 

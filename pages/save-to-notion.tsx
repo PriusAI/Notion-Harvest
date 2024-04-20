@@ -1,21 +1,22 @@
 import { AddForm, Login, SavePage, SelectForm } from '@/components/Harvest'
 import React, { useState, useCallback, useEffect } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { CollectionInfo, RouteType } from '@/components/Harvest'
+import type { RouteType } from '@/components/Harvest'
 import { updateHeight } from '@/components/Harvest/utils'
 
 import PubSub from '@/lib/PubSub'
 import { SELECTED_FORM } from '@/lib/constant'
-
-const selectFormToStorage = (collection?: CollectionInfo) => {
-  if (!collection) return
-  window.localStorage.setItem(SELECTED_FORM, collection.id)
-}
+import { useLocalStorageState } from 'ahooks'
 
 const SaveToNotion = () => {
+  const [loading, setLoading] = useState(true)
   const [route, setRoute] = useState<RouteType>('selectForm')
+  const [, selectFormToStorage] = useLocalStorageState(SELECTED_FORM, {
+    defaultValue: '' as string
+  })
 
   useEffect(() => {
+    setLoading(false)
     function onmessage(event: MessageEvent) {
       if (event.data?.s !== 'notion-harvest') return
       const { type, value } = event.data
@@ -34,29 +35,43 @@ const SaveToNotion = () => {
     }
   }, [])
 
-  const switchRoute = useCallback((route: RouteType, data?: any) => {
-    setRoute(route)
-    switch (route) {
-      case 'addForm':
-        updateHeight(640)
-        break
-      case 'login':
-        updateHeight(320)
-        break
-      case 'savePage':
-        updateHeight(480)
-        selectFormToStorage(data?.collection)
-        break
-      case 'selectForm':
-        updateHeight(320)
-        break
+  const switchRoute = useCallback(
+    (route: RouteType, data?: any) => {
+      setRoute(route)
+      switch (route) {
+        case 'addForm':
+          updateHeight(640)
+          break
+        case 'login':
+          updateHeight(320)
+          break
+        case 'savePage':
+          updateHeight(480)
+          if (data?.collection?.id) selectFormToStorage(data.collection.id)
+          break
+        case 'selectForm':
+          updateHeight(320)
+          break
 
-      default:
-        break
-    }
-  }, [])
+        default:
+          break
+      }
+    },
+    [selectFormToStorage]
+  )
+
+  const renderSkeleton = () => (
+    <div className='flex items-center space-x-4'>
+      <Skeleton className='h-12 w-12 rounded-full' />
+      <div className='space-y-2'>
+        <Skeleton className='h-4 w-[250px]' />
+        <Skeleton className='h-4 w-[200px]' />
+      </div>
+    </div>
+  )
 
   const render = () => {
+    if (loading) return renderSkeleton()
     const commProps = { switchRoute }
     switch (route) {
       case 'addForm':
@@ -69,15 +84,7 @@ const SaveToNotion = () => {
         return <SelectForm {...commProps} />
 
       default:
-        return (
-          <div className='flex items-center space-x-4'>
-            <Skeleton className='h-12 w-12 rounded-full' />
-            <div className='space-y-2'>
-              <Skeleton className='h-4 w-[250px]' />
-              <Skeleton className='h-4 w-[200px]' />
-            </div>
-          </div>
-        )
+        return renderSkeleton()
     }
   }
   return <div>{render()}</div>

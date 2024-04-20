@@ -10,7 +10,7 @@ export const SavePage = ({ switchRoute }: BaseProps) => {
     defaultValue: [] as CollectionInfo[]
   })
   const [collectionId] = useLocalStorageState(SELECTED_FORM, {
-    defaultValue: null as string | null
+    defaultValue: '' as string
   })
   const { loading, run } = useRequest(
     async () => {
@@ -25,6 +25,8 @@ export const SavePage = ({ switchRoute }: BaseProps) => {
   )
 
   const collection = collections.find((item) => item.id === collectionId)
+
+  console.log('collection', collections, collectionId, collection)
 
   return (
     <div className='flex flex-col'>

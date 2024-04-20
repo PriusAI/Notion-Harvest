@@ -14,6 +14,9 @@ export const SelectForm = ({ loading, switchRoute }: SelectFormProps) => {
   const [collections] = useLocalStorageState(SELECTD_FORMS, {
     defaultValue: [] as CollectionInfo[]
   })
+
+  console.log('collections', collections)
+
   if (loading) return null
   return (
     <div className='p-6 pt-3 grid gap-1'>

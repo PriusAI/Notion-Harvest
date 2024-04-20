@@ -2,9 +2,12 @@ import React from 'react'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { BaseProps } from './types'
 
-interface SelectFormProps extends BaseProps {}
+interface SelectFormProps extends BaseProps {
+  loading?: boolean
+}
 
-export const SelectForm = ({}: SelectFormProps) => {
+export const SelectForm = ({ loading }: SelectFormProps) => {
+  if (loading) return null
   return (
     <div className='p-6 pt-0 grid gap-1'>
       <div className='-mx-2 flex items-start space-x-4 rounded-md p-2 transition-all hover:bg-accent hover:text-accent-foreground'>

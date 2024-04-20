@@ -1,7 +1,11 @@
+import React from 'react'
+
 import { BaseProps } from './types'
 
-interface AddFormProps extends BaseProps {}
+interface AddFormProps extends BaseProps {
+  open?: boolean
+}
 
-export const AddForm = ({}: AddFormProps) => {
-  return null
+export const AddForm = ({ open }: AddFormProps) => {
+  return open ? <div></div> : null
 }

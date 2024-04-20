@@ -1,7 +1,11 @@
+import React from 'react'
+
 import { BaseProps } from './types'
 
-interface LoginProps extends BaseProps {}
+interface LoginProps extends BaseProps {
+  open?: boolean
+}
 
-export const Login = ({}: LoginProps) => {
-  return null
+export const Login = ({open}: LoginProps) => {
+  return open ? <div></div> : null
 }

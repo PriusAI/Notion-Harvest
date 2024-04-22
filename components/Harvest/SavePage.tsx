@@ -85,7 +85,7 @@ export const SavePage = ({ userId, switchRoute }: BaseProps) => {
         <div className='pl-2 font-medium leading-none'>{collection.name}</div>
       </div>
 
-      <div className='flex-1'>
+      <div className='w-full flex-1'>
         {req.loading ? (
           <div className='w-full flex items-center space-x-4'>
             <Skeleton className='h-12 w-12 rounded-full' />
@@ -105,7 +105,11 @@ export const SavePage = ({ userId, switchRoute }: BaseProps) => {
               />
             </div>
             <Button onClick={run}>
-              {loading ? <ReloadIcon /> : <PaperPlaneIcon />}
+              {loading ? (
+                <ReloadIcon className='animate-spin' />
+              ) : (
+                <PaperPlaneIcon />
+              )}
               <span className='ml-1'>Save Page</span>
             </Button>
           </>

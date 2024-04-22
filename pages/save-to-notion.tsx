@@ -2,27 +2,29 @@ import { AddForm, Login, SavePage, SelectForm } from '@/components/Harvest'
 import React, { useState, useCallback, useEffect } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { RouteType } from '@/components/Harvest'
-import { updateHeight } from '@/components/Harvest/utils'
+import { getSpaceIds, updateHeight } from '@/components/Harvest/utils'
 
 import PubSub from '@/lib/PubSub'
 import { SELECTED_FORM } from '@/lib/constant'
-import { useLocalStorageState } from 'ahooks'
+import { useLocalStorageState, useMount } from 'ahooks'
 
 const SaveToNotion = () => {
   const [loading, setLoading] = useState(true)
-  const [route, setRoute] = useState<RouteType>('selectForm')
+  const [route, setRoute] = useState<RouteType>()
   const [, selectFormToStorage] = useLocalStorageState(SELECTED_FORM, {
     defaultValue: '' as string
   })
 
   useEffect(() => {
-    setLoading(false)
     function onmessage(event: MessageEvent) {
       if (event.data?.s !== 'notion-harvest') return
       const { type, value } = event.data
       switch (type) {
         case 'fetchData':
           PubSub.pub('fetchData', value)
+          break
+        case 'getWebContent':
+          PubSub.pub('getWebContent', value)
           break
         default:
           break
@@ -34,6 +36,24 @@ const SaveToNotion = () => {
       window.removeEventListener('message', onmessage)
     }
   }, [])
+  useMount(() => {
+    setTimeout(() => {
+      getSpaceIds()
+        .then((spaceIds) => {
+          if (spaceIds.length === 0) {
+            switchRoute('login')
+          } else {
+            switchRoute('selectForm')
+          }
+        })
+        .catch(() => {
+          switchRoute('login')
+        })
+        .finally(() => {
+          setLoading(false)
+        })
+    }, 300)
+  })
 
   const switchRoute = useCallback(
     (route: RouteType, data?: any) => {
@@ -43,7 +63,7 @@ const SaveToNotion = () => {
           updateHeight(640)
           break
         case 'login':
-          updateHeight(320)
+          updateHeight(180)
           break
         case 'savePage':
           updateHeight(480)
@@ -61,11 +81,11 @@ const SaveToNotion = () => {
   )
 
   const renderSkeleton = () => (
-    <div className='flex items-center space-x-4'>
+    <div className='w-full p-3 flex items-center space-x-4'>
       <Skeleton className='h-12 w-12 rounded-full' />
-      <div className='space-y-2'>
-        <Skeleton className='h-4 w-[250px]' />
-        <Skeleton className='h-4 w-[200px]' />
+      <div className='flex-1 space-y-2'>
+        <Skeleton className='h-4 w-2/5' />
+        <Skeleton className='h-4 w-4/5' />
       </div>
     </div>
   )
@@ -77,7 +97,7 @@ const SaveToNotion = () => {
       case 'addForm':
         return <AddForm {...commProps} />
       case 'login':
-        return <Login {...commProps} />
+        return <Login />
       case 'savePage':
         return <SavePage {...commProps} />
       case 'selectForm':

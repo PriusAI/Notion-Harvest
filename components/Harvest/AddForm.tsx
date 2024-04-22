@@ -46,6 +46,7 @@ export const AddForm = ({ switchRoute }: BaseProps) => {
               name: v.value?.name[0]?.[0] || '-',
               icon: v.value?.icon || '/icons/book-closed_lightgray.svg',
               space_id: v.value?.space_id || '',
+              schema: v.value?.schema || {},
               user_id: ret.userId
             } as CollectionInfo)
         )

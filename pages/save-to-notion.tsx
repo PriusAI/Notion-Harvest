@@ -1,15 +1,23 @@
-import { AddForm, Login, SavePage, SelectForm } from '@/components/Harvest'
+import {
+  AddForm,
+  Login,
+  SavePage,
+  SelectForm,
+  SaveDone
+} from '@/components/Harvest'
 import React, { useState, useCallback, useEffect } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { RouteType } from '@/components/Harvest'
-import { getSpaceIds, updateHeight } from '@/components/Harvest/utils'
+import { getUserId, updateHeight } from '@/components/Harvest/utils'
 
 import PubSub from '@/lib/PubSub'
 import { SELECTED_FORM } from '@/lib/constant'
 import { useLocalStorageState, useMount } from 'ahooks'
 
 const SaveToNotion = () => {
+  const [userId, setUserId] = useState('')
   const [loading, setLoading] = useState(true)
+  const [pageData, setPageData] = useState<any>({})
   const [route, setRoute] = useState<RouteType>()
   const [, selectFormToStorage] = useLocalStorageState(SELECTED_FORM, {
     defaultValue: '' as string
@@ -38,13 +46,10 @@ const SaveToNotion = () => {
   }, [])
   useMount(() => {
     setTimeout(() => {
-      getSpaceIds()
-        .then((spaceIds) => {
-          if (spaceIds.length === 0) {
-            switchRoute('login')
-          } else {
-            switchRoute('selectForm')
-          }
+      getUserId()
+        .then((userId) => {
+          setUserId(userId)
+          switchRoute('selectForm')
         })
         .catch(() => {
           switchRoute('login')
@@ -73,6 +78,10 @@ const SaveToNotion = () => {
           updateHeight(320)
           break
 
+        case 'saveDone':
+          updateHeight(180)
+          if (data?.pageId) setPageData(data)
+          break
         default:
           break
       }
@@ -92,7 +101,7 @@ const SaveToNotion = () => {
 
   const render = () => {
     if (loading) return renderSkeleton()
-    const commProps = { switchRoute }
+    const commProps = { userId, switchRoute }
     switch (route) {
       case 'addForm':
         return <AddForm {...commProps} />
@@ -102,11 +111,12 @@ const SaveToNotion = () => {
         return <SavePage {...commProps} />
       case 'selectForm':
         return <SelectForm {...commProps} />
-
+      case 'saveDone':
+        return <SaveDone {...pageData} />
       default:
         return renderSkeleton()
     }
   }
-  return <div>{render()}</div>
+  return <div data-route={route}>{render()}</div>
 }
 export default SaveToNotion

@@ -1,7 +1,14 @@
-const routeType = ['addForm', 'login', 'savePage', 'selectForm', 'saveDone'] as const
+const routeType = [
+  'addForm',
+  'login',
+  'savePage',
+  'selectForm',
+  'saveDone'
+] as const
 
 export type RouteType = typeof routeType[number]
 export interface BaseProps {
+  userId: string
   switchRoute: (route: RouteType, data?: any) => void
 }
 
@@ -15,4 +22,5 @@ export interface CollectionInfo {
   name: string
   space_id: string
   user_id: string
+  schema: any
 }

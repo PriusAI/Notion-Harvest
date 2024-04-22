@@ -12,14 +12,35 @@ export const updateHeight = (height: number) => {
   )
 }
 
+export const closeModal = () => {
+  window.parent.postMessage({ s: 'notion-harvest', type: 'closeModal' }, '*')
+}
+
+export const getWebContent = exec_timeout('请求数据超时', async () => {
+  return new Promise<{ title: string; url: string; content: string }>(
+    (resolve, reject) => {
+      PubSub.sub('getWebContent', (res) => {
+        if (res.ok) {
+          resolve(res.data)
+        } else {
+          const err: any = Error(res?.error || '请求数据失败')
+          err.code = res.code
+          reject(err)
+        }
+      })
+
+      window.parent.postMessage(
+        { s: 'notion-harvest', type: 'getWebContent' },
+        '*'
+      )
+    }
+  )
+})
+
 export const fetchData = exec_timeout(
   '请求数据超时',
-  async (url: string, init?: RequestInit) => {
-    window.parent.postMessage(
-      { s: 'notion-harvest', type: 'fetchData', value: { url, init } },
-      '*'
-    )
-    return new Promise<any>((resolve, reject) => {
+  async <T = any>(url: string, init?: RequestInit) => {
+    return new Promise<T>((resolve, reject) => {
       PubSub.sub('fetchData', (res) => {
         if (res.ok) {
           resolve(res.data)
@@ -29,9 +50,56 @@ export const fetchData = exec_timeout(
           reject(err)
         }
       })
+
+      window.parent.postMessage(
+        { s: 'notion-harvest', type: 'fetchData', value: { url, init } },
+        '*'
+      )
     })
   }
 )
+
+export const getUserId = () => fetchData<string>('/getUserId')
+
+export const submitTransaction = (operations: any[]) =>
+  fetchData('/submitTransaction', {
+    method: 'POST',
+    body: JSON.stringify({
+      requestId: uuid(),
+      transactions: [{ id: uuid(), operations }]
+    })
+  })
+
+// TODO: 上传文件并获取文件URL
+export const getUploadFileUrl = () =>
+  fetchData('/getUploadFileUrl', {
+    method: 'POST',
+    body: JSON.stringify({
+      bucket: 'secure',
+      name: 'stn-uIY9eRTCeHljmsZo86OSxppEu2y5Th4wNNNTFqa2.jpeg',
+      contentType: 'image/jpeg',
+      record: {
+        id: 'a72ffa14-f3a3-4edc-92aa-ecc98945dcba',
+        table: 'collection',
+        spaceId: 'd3a08a39-b3d3-43b3-bd77-621f7704b417'
+      },
+      supportExtraHeaders: false,
+      contentLength: 499835
+    })
+  }).then(() => {
+    const ret = {
+      url: 'https://prod-files-secure.s3.us-west-2.amazonaws.com/d3a08a39-b3d3-43b3-bd77-621f7704b417/997f889e-6321-47a5-bb1a-575fce696c0f/stn-uIY9eRTCeHljmsZo86OSxppEu2y5Th4wNNNTFqa2.jpeg',
+      signedGetUrl:
+        'https://file.notion.so/f/f/d3a08a39-b3d3-43b3-bd77-621f7704b417/997f889e-6321-47a5-bb1a-575fce696c0f/stn-uIY9eRTCeHljmsZo86OSxppEu2y5Th4wNNNTFqa2.jpeg?id=a72ffa14-f3a3-4edc-92aa-ecc98945dcba&table=collection&spaceId=d3a08a39-b3d3-43b3-bd77-621f7704b417&expirationTimestamp=1713916800000&signature=-UsGr2MqNjC7T7VympWuph639sE2ks3sIWfl4YVMqIY',
+      signedPutUrl:
+        'https://prod-files-secure.s3.us-west-2.amazonaws.com/d3a08a39-b3d3-43b3-bd77-621f7704b417/997f889e-6321-47a5-bb1a-575fce696c0f/stn-uIY9eRTCeHljmsZo86OSxppEu2y5Th4wNNNTFqa2.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45HZZMZUHI%2F20240422%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20240422T030449Z&X-Amz-Expires=86400&X-Amz-Signature=73a68f5f74cf79f254334109a61005d9f8747a8f7ceff9a1d98578f08f80ef08&X-Amz-SignedHeaders=host&x-id=PutObject',
+      putHeaders: []
+    }
+    return fetch(ret.signedPutUrl, {
+      method: 'PUT',
+      body: new Blob()
+    })
+  })
 
 export const loadPageChunk = (pageId: string, cursor = false) =>
   fetchData('/loadPageChunk', {
@@ -39,17 +107,7 @@ export const loadPageChunk = (pageId: string, cursor = false) =>
     body: JSON.stringify({
       limit: 100,
       cursor: {
-        stack: cursor
-          ? [
-              [
-                {
-                  id: pageId,
-                  table: 'block',
-                  index: 0
-                }
-              ]
-            ]
-          : []
+        stack: cursor ? [[{ id: pageId, table: 'block', index: 0 }]] : []
       },
       chunkNumber: 0,
       verticalColumns: false,

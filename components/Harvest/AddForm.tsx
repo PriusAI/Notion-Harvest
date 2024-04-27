@@ -38,26 +38,37 @@ export const AddForm = ({ switchRoute }: BaseProps) => {
       }
       const spaces = await getPublicSpaceData(spaceIds)
       const ret = await searchDatabases(spaceId, query)
-      const collections = Object.values(ret.recordMap.collection)
+      const blocks = Object.values(ret.recordMap?.block || {})
+        .map((b: any) => b.value)
+        .filter((b) => b.type === 'collection_view_page')
+      const collections = Object.values(ret.recordMap?.collection || {})
         .map(
           (v: any) =>
             ({
               id: v.value?.id || '',
               name: v.value?.name[0]?.[0] || '-',
               icon: v.value?.icon || '/icons/book-closed_lightgray.svg',
-              space_id: v.value?.space_id || '',
-              schema: v.value?.schema || {},
               user_id: ret.userId
             } as CollectionInfo)
         )
         .filter((v) => !!v.id)
+        .map((v) => {
+          const block = blocks.find((b) => b.collection_id === v.id)
+          if (block) {
+            return { ...v, id: block.id }
+          }
+          return null
+        })
+        .filter(Boolean)
+
+      console.log('query', query, collections)
 
       return { collections, spaceIds, spaces }
     },
     {
       debounceWait: 300,
       onSuccess(data) {
-        setSpaceId(data.spaceIds[0])
+        if (!spaceId) setSpaceId(data.spaceIds[0])
       }
     }
   )

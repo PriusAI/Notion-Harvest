@@ -65,7 +65,7 @@ const SaveToNotion = () => {
       setRoute(route)
       switch (route) {
         case 'addForm':
-          updateHeight(640)
+          updateHeight(560)
           break
         case 'login':
           updateHeight(180)

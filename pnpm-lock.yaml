@@ -15,8 +15,8 @@ dependencies:
     specifier: ^1.6.10
     version: 1.6.10
   '@mozilla/readability':
-    specifier: ^0.5.0
-    version: 0.5.0
+    specifier: github:PriusAI/readability
+    version: github.com/PriusAI/readability/080bd4cd01c633c01aa71b668d26b8fb844f8164
   '@radix-ui/react-icons':
     specifier: ^1.3.0
     version: 1.3.0(react@18.2.0)
@@ -607,11 +607,6 @@ packages:
     dependencies:
       katex: 0.15.3
       react: 18.2.0
-    dev: false
-
-  /@mozilla/readability@0.5.0:
-    resolution: {integrity: sha512-Z+CZ3QaosfFaTqvhQsIktyGrjFjSC0Fa4EMph4mqKnWhmyoGICsV/8QK+8HpXut6zV7zwfWwqDmEjtk1Qf6EgQ==}
-    engines: {node: '>=14.0.0'}
     dev: false
 
   /@next/bundle-analyzer@12.3.1:
@@ -6383,4 +6378,11 @@ packages:
 
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
+    dev: false
+
+  github.com/PriusAI/readability/080bd4cd01c633c01aa71b668d26b8fb844f8164:
+    resolution: {tarball: https://codeload.github.com/PriusAI/readability/tar.gz/080bd4cd01c633c01aa71b668d26b8fb844f8164}
+    name: '@mozilla/readability'
+    version: 0.5.0
+    engines: {node: '>=14.0.0'}
     dev: false

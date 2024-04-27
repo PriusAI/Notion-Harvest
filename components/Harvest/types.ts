@@ -20,7 +20,5 @@ export interface CollectionInfo {
   id: string
   icon: string
   name: string
-  space_id: string
   user_id: string
-  schema: any
 }

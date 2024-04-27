@@ -4,10 +4,17 @@ import { toMdast } from 'hast-util-to-mdast'
 import { gfmToMarkdown } from 'mdast-util-gfm'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { markdownToBlocks } from '@tryfabric/martian'
+import { Readability } from '@mozilla/readability'
 
-export const html2blocks = (html: string) => {
+export const html2blocks = (htmlContent: string) => {
   try {
-    const hast = fromHtml(html)
+    const parser = new DOMParser()
+
+    const doc = parser.parseFromString(htmlContent, 'text/html')
+    const reader = new Readability(doc)
+    const article = reader.parse()
+
+    const hast = fromHtml(article.content)
     const mdast = toMdast(hast, {
       handlers: {
         base(state, node) {

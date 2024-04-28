@@ -72,8 +72,24 @@ export const SavePage = ({ userId, switchRoute }: BaseProps) => {
           }
         }
         if (newKey) {
-          // TODO: 需要新增URL属性
-          // pageOp.args.properties[newKey] = [[req.data.url]]
+          await submitTransaction([
+            {
+              pointer: {
+                id: collection.id,
+                table: 'collection',
+                spaceId: spaceId
+              },
+              path: ['schema'],
+              command: 'update',
+              args: {
+                [newKey]: {
+                  name: 'URL',
+                  type: 'url'
+                }
+              }
+            }
+          ])
+          pageOp.args.properties[newKey] = [[req.data.url]]
         }
       }
 

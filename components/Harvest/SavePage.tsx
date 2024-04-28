@@ -4,7 +4,11 @@ import { useLocalStorageState, useRequest } from 'ahooks'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ReloadIcon, PaperPlaneIcon } from '@radix-ui/react-icons'
+import {
+  ReloadIcon,
+  PaperPlaneIcon,
+  ChevronLeftIcon
+} from '@radix-ui/react-icons'
 import { BaseProps } from './types'
 import { SELECTED_FORM } from '@/lib/constant'
 import { getWebContent, loadPageChunk, submitTransaction } from './utils'
@@ -121,7 +125,17 @@ export const SavePage = ({ userId, switchRoute }: BaseProps) => {
   return (
     <div className='flex flex-col p-3'>
       <div className='flex items-center justify-between p-2'>
-        <span>form</span>
+        <div className='flex items-center'>
+          <Button
+            size='icon'
+            variant='secondary'
+            className='rounded-full'
+            onClick={() => switchRoute('selectForm')}
+          >
+            <ChevronLeftIcon />
+          </Button>
+          <span className='ml-2'>form</span>
+        </div>
         {collection?.name ? (
           <div className='pl-2 font-medium leading-none'>{collection.name}</div>
         ) : (

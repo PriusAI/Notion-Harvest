@@ -1,7 +1,9 @@
 import React from 'react'
 import { useLocalStorageState, useRequest } from 'ahooks'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ChevronLeftIcon } from '@radix-ui/react-icons'
 import {
   Select,
   SelectContent,
@@ -75,8 +77,19 @@ export const AddForm = ({ switchRoute }: BaseProps) => {
   return (
     <div className='p-3'>
       <div className='flex justify-between items-center'>
-        <span>In space</span>
-        {!loading && (
+        <div className='flex items-center'>
+          <Button
+            size='icon'
+            variant='secondary'
+            className='rounded-full'
+            onClick={() => switchRoute('selectForm')}
+          >
+            <ChevronLeftIcon />
+          </Button>
+          <span className='ml-2'>In space</span>
+        </div>
+
+        {!!data?.spaces && (
           <Select
             value={spaceId}
             onValueChange={(spaceId) => {
@@ -84,7 +97,7 @@ export const AddForm = ({ switchRoute }: BaseProps) => {
               run('', spaceId, data?.spaceIds || [])
             }}
           >
-            <SelectTrigger className='w-[180px]'>
+            <SelectTrigger className='w-[120px]'>
               <SelectValue placeholder='Select a space' />
             </SelectTrigger>
             <SelectContent>

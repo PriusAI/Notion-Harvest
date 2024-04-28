@@ -2,22 +2,24 @@ import React from 'react'
 import { PlusCircledIcon } from '@radix-ui/react-icons'
 import { BaseProps, CollectionInfo } from './types'
 import { Button } from '@/components/ui/button'
-import { useLocalStorageState } from 'ahooks'
+import { useLocalStorageState, useMount } from 'ahooks'
 import { Collection } from './Collection'
-import { SELECTD_FORMS } from '@/lib/constant'
+import { SELECTD_FORMS, SELECTED_FORM } from '@/lib/constant'
 
-interface SelectFormProps extends BaseProps {
-  loading?: boolean
-}
-
-export const SelectForm = ({ loading, switchRoute }: SelectFormProps) => {
+export const SelectForm = ({ switchRoute }: BaseProps) => {
   const [collections] = useLocalStorageState(SELECTD_FORMS, {
     defaultValue: [] as CollectionInfo[]
   })
+  const [collectionId] = useLocalStorageState(SELECTED_FORM, {
+    defaultValue: '' as string
+  })
 
-  console.log('collections', collections)
+  useMount(() => {
+    if (collectionId) {
+      switchRoute('savePage', {})
+    }
+  })
 
-  if (loading) return null
   return (
     <div className='p-6 pt-3 grid gap-1'>
       {collections.map((collection) => (

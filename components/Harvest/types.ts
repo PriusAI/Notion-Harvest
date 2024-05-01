@@ -10,6 +10,7 @@ const routeType = [
 export type RouteType = typeof routeType[number]
 export interface BaseProps {
   userId: string
+  closeModal: () => void
   switchRoute: (route: RouteType, data?: any) => void
 }
 

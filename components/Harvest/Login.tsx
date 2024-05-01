@@ -1,8 +1,8 @@
 import React from 'react'
 import { Button } from '@/components/ui/button'
-import { closeModal } from './utils'
+import { BaseProps } from './types'
 
-export const Login = () => {
+export const Login = ({ closeModal }: BaseProps) => {
   const onLogin = () => {
     window.open('https://www.notion.so/login')
     closeModal()

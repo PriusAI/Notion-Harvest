@@ -12,10 +12,6 @@ export const updateHeight = (height: number) => {
   )
 }
 
-export const closeModal = () => {
-  window.parent.postMessage({ s: 'notion-harvest', type: 'closeModal' }, '*')
-}
-
 export const getWebContent = exec_timeout('请求数据超时', async () => {
   return new Promise<{ title: string; url: string; content: string }>(
     (resolve, reject) => {

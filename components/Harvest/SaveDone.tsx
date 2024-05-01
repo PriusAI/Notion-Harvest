@@ -1,13 +1,13 @@
 import React from 'react'
 import { CheckCircledIcon } from '@radix-ui/react-icons'
 import { Button } from '@/components/ui/button'
-import { closeModal } from './utils'
+import { BaseProps } from './types'
 
-interface SaveDoneProps {
+interface SaveDoneProps extends BaseProps {
   pageId: string
 }
 
-export const SaveDone = ({ pageId }: SaveDoneProps) => {
+export const SaveDone = ({ pageId, closeModal }: SaveDoneProps) => {
   const onOpen = () => {
     window.open(`https://www.notion.so/${pageId}`)
     closeModal()

@@ -13,7 +13,10 @@ import { getUserId, updateHeight } from '@/components/Harvest/utils'
 import PubSub from '@/lib/PubSub'
 import { SELECTED_FORM } from '@/lib/constant'
 import { useLocalStorageState, useMount } from 'ahooks'
+import { Button } from '@/components/ui/button'
+import { Cross1Icon } from '@radix-ui/react-icons'
 
+const isDev = process.env.NEXT_PUBLIC_NODE_ENV === 'development'
 const SaveToNotion = () => {
   const [userId, setUserId] = useState('')
   const [loading, setLoading] = useState(true)
@@ -60,6 +63,11 @@ const SaveToNotion = () => {
     }, 300)
   })
 
+  const closeModal = useCallback(() => {
+    window.parent.postMessage({ s: 'notion-harvest', type: 'closeModal' }, '*')
+    setRoute(null)
+  }, [])
+
   const switchRoute = useCallback(
     (route: RouteType, data?: any) => {
       setRoute(route)
@@ -101,13 +109,13 @@ const SaveToNotion = () => {
 
   const render = () => {
     if (loading) return renderSkeleton()
-    const commProps = { userId, switchRoute }
+    const commProps = { userId, switchRoute, closeModal }
 
     switch (route) {
       case 'addForm':
         return <AddForm {...commProps} />
       case 'login':
-        return <Login />
+        return <Login {...commProps} />
       case 'savePage':
         return <SavePage {...commProps} />
       case 'selectForm':
@@ -115,11 +123,23 @@ const SaveToNotion = () => {
       case 'firstSelectForm':
         return <SelectForm {...commProps} first />
       case 'saveDone':
-        return <SaveDone {...pageData} />
+        return <SaveDone {...commProps} {...pageData} />
       default:
         return renderSkeleton()
     }
   }
-  return <div data-route={route}>{render()}</div>
+  return (
+    <div className='flex flex-col w-full h-full rounded-xl' data-route={route}>
+      {isDev && (
+        <div className='flex items-center justify-between p-2 rounded-t-xl'>
+          <div className='pl-2 font-medium leading-none'>Notion Harvest</div>
+          <Button size='icon' variant='ghost' onClick={closeModal}>
+            <Cross1Icon />
+          </Button>
+        </div>
+      )}
+      {render()}
+    </div>
+  )
 }
 export default SaveToNotion

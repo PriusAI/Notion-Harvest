@@ -6,7 +6,10 @@ import { useLocalStorageState, useMount } from 'ahooks'
 import { Collection } from './Collection'
 import { SELECTD_FORMS, SELECTED_FORM } from '@/lib/constant'
 
-export const SelectForm = ({ switchRoute }: BaseProps) => {
+export const SelectForm = ({
+  first,
+  switchRoute
+}: BaseProps & { first?: boolean }) => {
   const [collections] = useLocalStorageState(SELECTD_FORMS, {
     defaultValue: [] as CollectionInfo[]
   })
@@ -15,7 +18,7 @@ export const SelectForm = ({ switchRoute }: BaseProps) => {
   })
 
   useMount(() => {
-    if (collectionId) {
+    if (collectionId && first) {
       switchRoute('savePage', {})
     }
   })

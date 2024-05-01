@@ -49,7 +49,7 @@ const SaveToNotion = () => {
       getUserId()
         .then((userId) => {
           setUserId(userId)
-          switchRoute('selectForm')
+          switchRoute('firstSelectForm')
         })
         .catch(() => {
           switchRoute('login')
@@ -102,6 +102,7 @@ const SaveToNotion = () => {
   const render = () => {
     if (loading) return renderSkeleton()
     const commProps = { userId, switchRoute }
+
     switch (route) {
       case 'addForm':
         return <AddForm {...commProps} />
@@ -111,6 +112,8 @@ const SaveToNotion = () => {
         return <SavePage {...commProps} />
       case 'selectForm':
         return <SelectForm {...commProps} />
+      case 'firstSelectForm':
+        return <SelectForm {...commProps} first />
       case 'saveDone':
         return <SaveDone {...pageData} />
       default:

@@ -2,6 +2,7 @@ const routeType = [
   'addForm',
   'login',
   'savePage',
+  'firstSelectForm',
   'selectForm',
   'saveDone'
 ] as const

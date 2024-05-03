@@ -16,7 +16,7 @@ import { useLocalStorageState, useMount } from 'ahooks'
 import { Button } from '@/components/ui/button'
 import { Cross1Icon } from '@radix-ui/react-icons'
 
-const isDev = process.env.NEXT_PUBLIC_NODE_ENV === 'development'
+// const isDev = process.env.NEXT_PUBLIC_NODE_ENV === 'development'
 const SaveToNotion = () => {
   const [userId, setUserId] = useState('')
   const [loading, setLoading] = useState(true)
@@ -130,14 +130,12 @@ const SaveToNotion = () => {
   }
   return (
     <div className='flex flex-col w-full h-full rounded-xl' data-route={route}>
-      {isDev && (
-        <div className='flex items-center justify-between p-2 rounded-t-xl'>
-          <div className='pl-2 font-medium leading-none'>Notion Harvest</div>
-          <Button size='icon' variant='ghost' onClick={closeModal}>
-            <Cross1Icon />
-          </Button>
-        </div>
-      )}
+      <div className='flex items-center justify-between p-2 rounded-t-xl'>
+        <div className='pl-2 font-medium leading-none'>Notion Harvest</div>
+        <Button size='icon' variant='ghost' onClick={closeModal}>
+          <Cross1Icon />
+        </Button>
+      </div>
       {render()}
     </div>
   )

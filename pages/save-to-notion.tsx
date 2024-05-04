@@ -76,7 +76,7 @@ const SaveToNotion = () => {
           updateHeight(560)
           break
         case 'login':
-          updateHeight(180)
+          updateHeight(240)
           break
         case 'savePage':
           updateHeight(480)
@@ -87,7 +87,7 @@ const SaveToNotion = () => {
           break
 
         case 'saveDone':
-          updateHeight(180)
+          updateHeight(240)
           if (data?.pageId) setPageData(data)
           break
         default:

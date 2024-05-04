@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid'
 
 import PubSub from '@/lib/PubSub'
-import { SpaceInfo } from './types'
+import { SpaceInfo, UserInfoWithSpace } from './types'
 
 const EXEC_TIMEOUT = 30 * 1000
 
@@ -57,9 +57,12 @@ export const fetchData = exec_timeout(
 
 export const getUserId = () => fetchData<string>('/getUserId')
 
-export const submitTransaction = (operations: any[]) =>
+export const submitTransaction = (userId: string, operations: any[]) =>
   fetchData('/submitTransaction', {
     method: 'POST',
+    headers: {
+      'X-Notion-Active-User-Header': userId
+    },
     body: JSON.stringify({
       requestId: uuid(),
       transactions: [{ id: uuid(), operations }]
@@ -67,9 +70,12 @@ export const submitTransaction = (operations: any[]) =>
   })
 
 // TODO: 上传文件并获取文件URL
-export const getUploadFileUrl = () =>
+export const getUploadFileUrl = (userId: string) =>
   fetchData('/getUploadFileUrl', {
     method: 'POST',
+    headers: {
+      'X-Notion-Active-User-Header': userId
+    },
     body: JSON.stringify({
       bucket: 'secure',
       name: 'stn-uIY9eRTCeHljmsZo86OSxppEu2y5Th4wNNNTFqa2.jpeg',
@@ -97,9 +103,12 @@ export const getUploadFileUrl = () =>
     })
   })
 
-export const loadPageChunk = (pageId: string, cursor = false) =>
+export const loadPageChunk = (pageId: string, userId: string, cursor = false) =>
   fetchData('/loadPageChunk', {
     method: 'POST',
+    headers: {
+      'X-Notion-Active-User-Header': userId
+    },
     body: JSON.stringify({
       limit: 100,
       cursor: {
@@ -111,17 +120,32 @@ export const loadPageChunk = (pageId: string, cursor = false) =>
     })
   }).then((res) => res)
 
-export const getSpaceIds = () =>
+export const getSpaces = () =>
   fetchData('/getSpaces', {
     method: 'POST'
   }).then((res: any) => {
-    return Object.values(res).reduce<string[]>((p: string[], c: any) => {
-      if (!c?.space_view) return p
-      const spaceIds = Object.values(c.space_view)
+    const spaces = Object.keys(res).map((key) => {
+      const user: UserInfoWithSpace = res[key]?.notion_user?.[key]?.value || {
+        id: key
+      }
+      user.spaces = []
+      user.spaceIds = Object.values(res[key]?.space_view || {})
         .map((v: any) => v?.value?.space_id)
         .filter(Boolean)
-      return p.concat(spaceIds)
-    }, [])
+      return user
+    })
+    const spaceIds = Object.values(res).reduce<string[]>(
+      (p: string[], c: any) => {
+        if (!c?.space_view) return p
+        const spaceIds = Object.values(c.space_view)
+          .map((v: any) => v?.value?.space_id)
+          .filter(Boolean)
+        return p.concat(spaceIds)
+      },
+      []
+    )
+
+    return { spaces, spaceIds }
   })
 
 export const getPublicSpaceData = (spaceIds: string[]) =>
@@ -132,9 +156,12 @@ export const getPublicSpaceData = (spaceIds: string[]) =>
     .then((res) => (res.results || []) as Array<SpaceInfo>)
     .then((res) => removeDuplicates(res, 'id'))
 
-export const searchDatabases = (spaceId: string, query = '') =>
+export const searchDatabases = (spaceId: string, userId: string, query = '') =>
   fetchData('/search', {
     method: 'POST',
+    headers: {
+      'X-Notion-Active-User-Header': userId
+    },
     body: JSON.stringify({
       type: 'BlocksInSpace',
       query,

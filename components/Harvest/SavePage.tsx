@@ -9,19 +9,24 @@ import {
   PaperPlaneIcon,
   ChevronLeftIcon
 } from '@radix-ui/react-icons'
-import { BaseProps } from './types'
-import { SELECTED_FORM } from '@/lib/constant'
+import { BaseProps, CollectionInfo } from './types'
+import { SELECTD_FORMS, SELECTED_FORM } from '@/lib/constant'
 import { getWebContent, loadPageChunk, submitTransaction } from './utils'
 import { html2blocks } from '@/lib/html2blocks'
 
-export const SavePage = ({ userId, switchRoute }: BaseProps) => {
+export const SavePage = ({ switchRoute }: BaseProps) => {
+  const [collections] = useLocalStorageState(SELECTD_FORMS, {
+    defaultValue: [] as CollectionInfo[]
+  })
   const [collectionId] = useLocalStorageState(SELECTED_FORM, {
     defaultValue: '' as string
   })
   const { loading, data: collection } = useRequest(() => {
-    return loadPageChunk(collectionId).then((res) => {
+    const c = collections.find((c) => c.id === collectionId)
+    return loadPageChunk(collectionId, c.user_id).then((res) => {
       const k = Object.keys(res.recordMap.collection)[0]
       const collection = res.recordMap.collection[k]?.value
+      collection.user_id = c.user_id
       return collection
     })
   })
@@ -31,6 +36,7 @@ export const SavePage = ({ userId, switchRoute }: BaseProps) => {
       if (!req.data?.content) return
       const pageId = uuid()
       const time = Date.now()
+      const userId = collection.user_id
       const spaceId = collection.space_id
       const blocks = html2blocks(req.data.content)
       if (!blocks.length) return
@@ -76,7 +82,7 @@ export const SavePage = ({ userId, switchRoute }: BaseProps) => {
           }
         }
         if (newKey) {
-          await submitTransaction([
+          await submitTransaction(userId, [
             {
               pointer: {
                 id: collection.id,
@@ -111,7 +117,7 @@ export const SavePage = ({ userId, switchRoute }: BaseProps) => {
           return block
         })
       ]
-      await submitTransaction(operations)
+      await submitTransaction(userId, operations)
       return pageId.replace(/-/g, '')
     },
     {

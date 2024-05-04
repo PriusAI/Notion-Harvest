@@ -14,6 +14,15 @@ export interface BaseProps {
   switchRoute: (route: RouteType, data?: any) => void
 }
 
+export interface UserInfo {
+  id: string
+  name: string
+  email: string
+}
+export interface UserInfoWithSpace extends UserInfo {
+  spaceIds: string[]
+  spaces: SpaceInfo[]
+}
 export interface SpaceInfo {
   id: string
   name: string

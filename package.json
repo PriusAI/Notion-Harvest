@@ -65,7 +65,8 @@
     "rss": "^1.2.2",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "youtube-transcript": "^1.2.1"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^12.3.1",

@@ -38,7 +38,7 @@ export const SavePage = ({ switchRoute }: BaseProps) => {
       const time = Date.now()
       const userId = collection.user_id
       const spaceId = collection.space_id
-      const blocks = html2blocks(req.data.content)
+      const blocks = await html2blocks(req.data)
       if (!blocks.length) return
       const schemaKeys = Object.keys(collection.schema || {})
       const urlKey = schemaKeys.filter((key) => {

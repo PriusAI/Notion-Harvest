@@ -6,14 +6,14 @@ import { toMarkdown } from 'mdast-util-to-markdown'
 import { markdownToBlocks } from '@tryfabric/martian'
 import type * as notion from '@tryfabric/martian/src/notion'
 import { Readability } from '@mozilla/readability'
-// import { YoutubeTranscript } from 'youtube-transcript'
 
 interface Params {
   url: string
   content: string
+  saveto?: boolean
 }
 
-type Block =
+export type Block =
   | notion.Block
   | {
       button: {
@@ -111,40 +111,25 @@ const block2blocks = (block: Block) => {
   return blocks
 }
 
-export const html2blocks = async ({ url, content }: Params) => {
+export const html2blocks = async ({ url, content, saveto }: Params) => {
   try {
     let blocks: Block[] = []
     if (
       url.startsWith('https://www.youtube.com') ||
       url.startsWith('https://youtube.com')
     ) {
-      // const transcript = await YoutubeTranscript.fetchTranscript(url)
-
-      // const transcriptBlocks = transcript.map(({ text, duration, offset }) => {
-      //   const block: Block = {
-      //     type: 'paragraph',
-      //     paragraph: {
-      //       rich_text: [
-      //         {
-      //           type: 'text',
-      //           text: { content: String(duration) },
-      //           annotations: { code: true, color: 'green_background' }
-      //         },
-      //         {
-      //           type: 'text',
-      //           text: { content: String(offset) },
-      //           annotations: { code: true, color: 'orange_background' }
-      //         },
-      //         {
-      //           type: 'text',
-      //           text: { content: text }
-      //         }
-      //       ],
-      //       color: 'default'
-      //     }
-      //   }
-      //   return block
-      // })
+      let transcriptBlocks: any[] = []
+      if (saveto) {
+        transcriptBlocks = await fetch('/api/nice/transcript', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ url })
+        })
+          .then((res) => res.json())
+          .then((res) => res.data as any[])
+      }
 
       blocks = [
         {
@@ -153,21 +138,18 @@ export const html2blocks = async ({ url, content }: Params) => {
             type: 'external',
             external: { url }
           }
-        },
-        // {
-        //   type: 'toggle',
-        //   toggle: {
-        //     rich_text: [
-        //       {
-        //         type: 'text',
-        //         text: { content: 'Transcript' }
-        //       }
-        //     ],
-        //     color: 'default',
-        //     children: transcriptBlocks
-        //   }
-        // }
+        }
       ]
+
+      if (transcriptBlocks.length) {
+        blocks.push({
+          type: 'heading_1',
+          heading_1: {
+            rich_text: [{ type: 'text', text: { content: 'Transcript' } }]
+          }
+        })
+        blocks.push(...transcriptBlocks)
+      }
     } else {
       const parser = new DOMParser()
 

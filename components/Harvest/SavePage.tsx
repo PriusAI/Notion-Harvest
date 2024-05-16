@@ -39,13 +39,17 @@ export const SavePage = ({ switchRoute }: BaseProps) => {
       const userId = collection.user_id
       const spaceId = collection.space_id
       const blocks = await html2blocks(req.data)
-      if (!blocks.length) return
+      if (!blocks.length) {
+        // TODO: 提示错误
+        return ''
+      }
       const schemaKeys = Object.keys(collection.schema || {})
       const urlKey = schemaKeys.filter((key) => {
         const v = collection.schema[key]
         if (v.type === 'url' && ['link', 'url'].includes(v.name.toLowerCase()))
           return key
       })[0]
+
       const pageOp = {
         id: pageId,
         table: 'block',
@@ -68,9 +72,10 @@ export const SavePage = ({ switchRoute }: BaseProps) => {
           properties: {
             title: [[req.data.title]]
           },
-          content: blocks.map((b) => b.id)
+          content: []
         }
       }
+
       if (urlKey) {
         pageOp.args.properties[urlKey] = [[req.data.url]]
       } else {
@@ -103,9 +108,20 @@ export const SavePage = ({ switchRoute }: BaseProps) => {
         }
       }
 
-      const operations = [
-        pageOp,
-        ...blocks.map((block) => {
+      await submitTransaction(userId, [pageOp])
+
+      const chunkSize = 480 // 每个块的大小
+      const numChunks = Math.ceil(blocks.length / chunkSize) // 总块数
+
+      for (let i = 0; i < numChunks; i++) {
+        const start = i * chunkSize // 当前块的起始索引
+        let end = start + chunkSize // 当前块的结束索引
+        if (end > blocks.length) {
+          end = blocks.length // 最后一块的结束索引
+        }
+        const chunk = blocks.slice(start, end) // 获取当前块的切片
+
+        const operations = chunk.map((block) => {
           block.args = {
             ...block.args,
             space_id: spaceId,
@@ -116,14 +132,19 @@ export const SavePage = ({ switchRoute }: BaseProps) => {
           }
           return block
         })
-      ]
-      await submitTransaction(userId, operations)
+        await submitTransaction(userId, operations)
+      }
+      pageOp.args.content = blocks.map((block) => block.id)
+      await submitTransaction(userId, [pageOp])
       return pageId.replace(/-/g, '')
     },
     {
       manual: true,
       onSuccess: (ret) => {
-        switchRoute('saveDone', { pageId: ret })
+        if (ret) {
+          switchRoute('saveDone', { pageId: ret })
+        }
+        // TODO: show error
       }
     }
   )

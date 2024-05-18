@@ -61,21 +61,6 @@ export default class MyDocument extends Document {
 `
               }}
             />
-            <script src='https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/0.1.0-beta.2/libs/oversea/index.js'></script>
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
-new CozeWebSDK.WebChatClient({
-  config: {
-    bot_id: '7355500991959580690',
-  },
-  componentProps: {
-    title: 'Harvest',
-    icon: 'https://harvest.prius.ai/favicon-192x192.png'
-  },
-});`
-              }}
-            ></script>
             <Main />
 
             <NextScript />

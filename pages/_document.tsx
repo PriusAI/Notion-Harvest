@@ -70,7 +70,8 @@ new CozeWebSDK.WebChatClient({
     bot_id: '7355500991959580690',
   },
   componentProps: {
-    title: 'Coze',
+    title: 'Harvest',
+    icon: 'https://harvest.prius.ai/favicon-192x192.png'
   },
 });`
               }}

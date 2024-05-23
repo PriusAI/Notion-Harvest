@@ -1,0 +1,15 @@
+POST http://localhost:4000/api/nice/transcript/format HTTP/1.1
+content-type: application/json
+
+{
+    "url" : "https://www.youtube.com/watch?v=zjkBMFhNj_g"
+}
+
+POST http://localhost:4000/api/nice/transcript/processing HTTP/1.1
+content-type: application/json
+
+{
+    "text" : "hi everyone so recently I gave a 30-minute talk on large language models just kind of like an intro talk um unfortunately that talk was not recorded but a lot of people came to me after the talk and they told me that uh they"
+}
+
+curl http://localhost:11434/api/tags

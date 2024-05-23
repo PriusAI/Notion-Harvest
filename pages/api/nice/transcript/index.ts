@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { YoutubeTranscript } from 'youtube-transcript'
-import { type Block } from '../../../lib/html2blocks'
+import { type Block } from '../../../../lib/html2blocks'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {

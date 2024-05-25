@@ -22,6 +22,9 @@ export const Collection = ({ collection: c, onClick }: Props) => {
     } else if (icon.startsWith('/icons')) {
       const url = `https://www.notion.so${icon}?mode=light`
       return <img src={url} alt='' className='h-5 w-5 rounded-full' />
+    } else if (icon.startsWith('/images')) {
+      const url = 'https://www.notion.so/icons/book-closed_lightgray.svg'
+      return <img src={url} alt='' className='h-5 w-5 rounded-full' />
     }
     return <span>{icon}</span>
   }
